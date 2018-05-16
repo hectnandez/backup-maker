@@ -38,17 +38,17 @@ class Create extends Command
          */
         $alias = $input->getOption('alias');
         if(empty($alias)){
-            $output->writeln('You have to especified the alias');
+            $output->writeln('<comment>You have to especified the alias</comment>');
             die();
         }
         $username = $input->getOption('username');
         if(empty($username)){
-            $output->writeln('You have to specified the Ftp\'s User');
+            $output->writeln('<comment>You have to specified the Ftp\'s User</comment>');
             die();
         }
         $password = $input->getOption('password');
         if(empty($password)){
-            $output->writeln('You have to specified the Ftp\'s Password');
+            $output->writeln('<comment>You have to specified the Ftp\'s Password</comment>');
             die();
         }
         try{
@@ -57,20 +57,21 @@ class Create extends Command
              */
             $siteConfig = $list->getSitesAvailables($alias);
             if($siteConfig == false){
-                $output->writeln('The alias that you entered is isn\'t found');
+                $output->writeln('<question>The alias that you entered is isn\'t found</question>');
                 die();
             }
             /**
              * Excute the backup
              */
-            $create = new CreateClass($siteConfig, $username, $password);
+            $create = new CreateClass($output, $siteConfig, $username, $password);
             if($create->executeBackupFtp()){
-
+                $output->writeln('<info>finalizado</info>');
+            } else {
+                $output->writeln('<error>Problemas para terminar el backup</error>');
             }
         } catch (\Exception $ex){
-            $output->writeln('ERROR: '.$ex->getMessage().' | File: '.$ex->getFile().' Line: '.$ex->getLine());
+            $output->writeln('<errror>ERROR: '.$ex->getMessage().' | File: '.$ex->getFile().' Line: '.$ex->getLine().'</errror>');
             die();
         }
-        $output->writeln('finalizado');
     }
 }

@@ -10,16 +10,39 @@ namespace BackupMaker\Classes;
 
 
 use BackupMaker\Util\Util;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Create
 {
+    /**
+     * @var OutputInterface $output
+     */
+    private $output;
+
+    /**
+     * @var array $config
+     */
     private $config;
+
+    /**
+     * @var $ftpConnection
+     */
     private $ftpConnection;
+
+    /**
+     * @var string $ftpUsername
+     */
     private $ftpUsername;
+
+    /**
+     * @var string $ftpPassword
+     */
     private $ftpPassword;
 
-    public function __construct($config, $ftpUsername, $ftpPassword)
+    public function __construct($output, $config, $ftpUsername, $ftpPassword)
     {
+        $this->output = $output;
         $this->config = $config;
         $this->ftpUsername = $ftpUsername;
         $this->ftpPassword = $ftpPassword;
@@ -40,6 +63,9 @@ class Create
             $this->config['origin']['path'],
             $this->config['origin']['not_folders']
         );
+        $this->output->writeln('<info>Descargando ficheros del servidor</info>');
+        $progressBar = new ProgressBar($this->output, count($listBackup));
+        $progressBar->start();
         foreach ($listBackup as $dir => $files){
             if($dir === '/'){
                 $remoteDir = $dir;
@@ -53,7 +79,10 @@ class Create
                 $localDirPath = $localDir.DIRECTORY_SEPARATOR.$file;
                 ftp_get($this->ftpConnection, $localDirPath, $remoteDirPath, FTP_BINARY);
             }
+            $progressBar->advance();
         }
+        $progressBar->finish();
+        $this->output->writeln(' ');
         $this->closeFtpConnection();
         return true;
     }
@@ -83,6 +112,7 @@ class Create
     private function ftpListRecursive($ftpConnection, $path, $notFolders = null) {
         $allFiles = array();
         $contents = ftp_mlsd($ftpConnection, $path);
+        $this->output->writeln('<info>Obteniendo listado de directorios y archivos de:'.$path.'</info>');
         foreach($contents as $currentFile) {
             if($currentFile['name'] == '.' || $currentFile['name'] == '..'){
                 continue;
