@@ -1,0 +1,24 @@
+{
+    "alias": "admsys.malavida.com",
+    "host": "91.192.110.217",
+    "port":	4421,
+    "destination":
+    {
+        "path": "admsys.malavida.com",
+        "date_pattern": "YmdH"
+    },
+    "origin":
+    {
+        "path": "/",
+        "not_folders":
+        [
+            "/backup_site",
+            "/cgi-bin",
+            "/logs",
+            "/stats",
+            "/mv-src",
+            "/COMNET",
+            "/OntEngine"
+        ]
+    }
+}

@@ -1,0 +1,21 @@
+#!/usr/bin/env php
+<?php
+require_once __DIR__.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
+
+use Symfony\Component\Console\Application;
+use BackupMaker\Command\Create;
+use BackupMaker\Command\ListAvailable;
+
+/**
+ * Directorio de configuraciones de sitios
+ */
+define('DIR_CONFIG', __DIR__.DIRECTORY_SEPARATOR.'config');
+define('DIR_BACKUP', dirname(__DIR__).DIRECTORY_SEPARATOR.'backups');
+
+/**
+ * Init de la aplicacion
+ */
+$app = new Application('Backup maker', 'v2.0.0');
+$app->add(new Create());
+$app->add(new ListAvailable());
+$app->run();
