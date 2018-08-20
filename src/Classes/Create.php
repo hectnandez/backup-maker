@@ -63,8 +63,26 @@ class Create
             $this->config['origin']['path'],
             $this->config['origin']['not_folders']
         );
+        /**
+         * 1th check for getting the list of files
+         */
+        if(empty($listBackup)){
+            $this->output->writeln('<error>Cambiando el metodo listado de archivos</error>');
+            $listBackup = $this->ftpListRecursiveNlist(
+                $this->ftpConnection,
+                $this->config['origin']['path'],
+                $this->config['origin']['not_folders']
+            );
+        }
+        /**
+         * 2nd check for getting the list of files
+         */
+        if(empty($listBackup)){
+            $this->output->writeln('<error>No se puede obtener el listado de ficheros</error>');
+            die();
+        }
         $this->output->writeln('<info>Descargando ficheros del servidor</info>');
-        $progressBar = new ProgressBar($this->output, count($listBackup));
+        $progressBar = new ProgressBar($this->output, Util::countFilesToDownload($listBackup));
         $progressBar->start();
         foreach ($listBackup as $dir => $files){
             if($dir === '/'){
@@ -77,9 +95,12 @@ class Create
             foreach ($files as $file){
                 $remoteDirPath = $remoteDir.$file;
                 $localDirPath = $localDir.DIRECTORY_SEPARATOR.$file;
-                ftp_get($this->ftpConnection, $localDirPath, $remoteDirPath, FTP_BINARY);
+                if(!ftp_get($this->ftpConnection, $localDirPath, $remoteDirPath, FTP_BINARY)){
+                    $this->output->writeln('<error>Problemas para descargar el fichero, remote:'.
+                        $remoteDirPath.' | local: '.$localDirPath.'</error>');
+                }
+                $progressBar->advance();
             }
-            $progressBar->advance();
         }
         $progressBar->finish();
         $this->output->writeln(' ');
@@ -113,6 +134,9 @@ class Create
         $allFiles = array();
         $contents = ftp_mlsd($ftpConnection, $path);
         $this->output->writeln('<info>Obteniendo listado de directorios y archivos de:'.$path.'</info>');
+        if(empty($contents)){
+            return $allFiles;
+        }
         foreach($contents as $currentFile) {
             if($currentFile['name'] == '.' || $currentFile['name'] == '..'){
                 continue;
@@ -133,6 +157,43 @@ class Create
         }
         return $allFiles;
     }
+
+    /**
+     * Funcion de backup para cuando el listado FTP por mlsd no funciona
+     * @param $ftpConnection
+     * @param $path
+     * @param null $notFolders
+     * @return array|bool
+     */
+    private function ftpListRecursiveNlist($ftpConnection, $path, $notFolders = null){
+        $allFiles = array();
+        $contents = ftp_nlist($ftpConnection, $path);
+        $this->output->writeln('<info>Obteniendo listado de directorios y archivos de:'.$path.'</info>');
+        if(empty($contents)){
+            return $allFiles;
+        }
+        foreach ($contents as $currentFile){
+            if($currentFile == '.' || $currentFile == '..'){
+                continue;
+            }
+            $fileInfo = pathinfo($currentFile);
+            if(!isset($fileInfo['extension']) && strlen($currentFile) <= 32 && !Util::isSpecialFile($currentFile)){
+                if($path === '/'){
+                    $newPath = $path.$currentFile;
+                } else {
+                    $newPath = $path.'/'.$currentFile;
+                }
+                if(is_array($notFolders) && in_array($newPath, $notFolders)){
+                    continue;
+                }
+                $allFiles = array_merge($allFiles, self::ftpListRecursiveNlist($ftpConnection, $newPath, $notFolders));
+            } else {
+                $allFiles[$path][] = $currentFile;
+            }
+        }
+        return $allFiles;
+    }
+
 
     /**
      * @return bool

@@ -1,0 +1,20 @@
+{
+    "alias": "www.example.com",
+    "host": "8.8.8.8",
+    "port":	21,
+    "destination":
+    {
+        "path": "name_of_the_proyect",
+        "date_pattern": "YmdH"
+    },
+    "origin":
+    {
+        "path": "/",
+        "not_folders":
+        [
+            "/src/config",
+            "/cgi-bin",
+            "/logs"
+        ]
+    }
+}

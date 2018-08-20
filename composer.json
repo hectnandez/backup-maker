@@ -3,6 +3,8 @@
     "description": "FTP backup maker create with symfony console components",
     "type": "project",
     "require": {
+        "php": ">=7.2.1",
+        "ext-ftp": "*",
         "symfony/console": "^4.0",
         "symfony/finder": "^4.0",
         "symfony/filesystem": "^4.0"

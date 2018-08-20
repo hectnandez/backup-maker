@@ -38,7 +38,7 @@ class Create extends Command
          */
         $alias = $input->getOption('alias');
         if(empty($alias)){
-            $output->writeln('<comment>You have to especified the alias</comment>');
+            $output->writeln('<comment>You have to specified the alias</comment>');
             die();
         }
         $username = $input->getOption('username');
