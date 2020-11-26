@@ -1,0 +1,14 @@
+# workspace files are user-specific
+*.sublime-workspace
+
+# PHPStorm project files
+.idea
+
+# VSCode project files
+.vscode
+
+# NetBeans project files
+nbproject
+
+/vendor/
+/node_modules/

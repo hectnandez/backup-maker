@@ -15,7 +15,7 @@ define('DIR_BACKUP', dirname(__DIR__).DIRECTORY_SEPARATOR.'backups');
 /**
  * Init de la aplicacion
  */
-$app = new Application('Backup maker', 'v2.0.0');
+$app = new Application('Backup maker', 'v1.0');
 $app->add(new Create());
 $app->add(new ListAvailable());
 $app->run();
