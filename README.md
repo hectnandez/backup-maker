@@ -4,7 +4,7 @@ PHP console apllication to make backup's via FTP with a minimal configuration fi
 ## Install aplication
 1. Clone the reposotiry:
     ```
-    git clone git@gitlab.ontnostromo:scripts/ontecnia/backup-maker.git
+    git clone https://github.com/hectnandez/backup-maker.git
     ```
 2. Go to the root directory of the proyect and install composer dependencies:
     ```
